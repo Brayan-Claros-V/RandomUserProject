@@ -46,7 +46,4 @@ class UserDataManager: UserRepositoryProtocol {
             print("Error")
         }
     }
-    
-    
-    
 }
