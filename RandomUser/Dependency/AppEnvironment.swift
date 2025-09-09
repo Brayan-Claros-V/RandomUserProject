@@ -9,11 +9,14 @@ import Foundation
 
 final class AppEnvironment {
     let userService: UserServiceProtocol
+    let userRepository: UserRepositoryProtocol
     
     init(
-        userService: UserServiceProtocol = UserService()
+        userService: UserServiceProtocol = UserService(),
+        userRepository: UserRepositoryProtocol = UserDataManager(context: PersistenceController.shared.container.viewContext)
     ) {
         self.userService = userService
+        self.userRepository = userRepository
     }
 }
 
