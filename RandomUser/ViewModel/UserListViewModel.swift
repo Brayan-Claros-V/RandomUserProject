@@ -11,7 +11,6 @@ import Foundation
 class UserListViewModel: ObservableObject {
     private var allUsers: [User] = []
     @Published var users: [User] = []
-    
     private let service: UserServiceProtocol
     private var currentPage = 1
     private let resultsPerPage = 20
@@ -29,7 +28,7 @@ class UserListViewModel: ObservableObject {
     func loadUsers() async {
         if let newUsers = try? await service.fetchUsers(page: currentPage, results: resultsPerPage) {
             allUsers.append(contentsOf: newUsers)
-            users = allUsers
+            filterUsers()
             currentPage += 1
         }
     }

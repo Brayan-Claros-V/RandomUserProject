@@ -28,7 +28,7 @@ struct ContentView: View {
                         .padding()
                         .textFieldStyle(.roundedBorder)
                     if(viewModel.users.isEmpty) {
-                        Text("...")
+                        Text("No users available")
                     }
                     
                     List(viewModel.users) { user in
@@ -65,7 +65,6 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                 }
-                                
                                 Spacer()
                                 
                                 Button {
@@ -101,14 +100,13 @@ struct ContentView: View {
                     .navigationBarTitle("Random Users")
                 }
             }
+            .tabItem {
+                Label("Users", systemImage: "person.3")
+            }
+            FavoriteView(environment: environment)
                 .tabItem {
-                    Label("Users", systemImage: "person.3")
+                    Label("Favorites", systemImage: "star.fill")
                 }
-                
-                FavoriteView(environment: environment)
-                    .tabItem {
-                        Label("Favorites", systemImage: "star.fill")
-                    }
         }
         .task {
             await viewModel.loadUsers()

@@ -29,7 +29,6 @@ struct UserDetailView: View {
                     .clipShape(Circle())
                     .shadow(radius: 4)
                 }
-
                 Text("\(user.name.first) \(user.name.last)")
                     .font(.title2)
                     .fontWeight(.semibold)

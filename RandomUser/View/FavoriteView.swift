@@ -28,6 +28,7 @@ struct FavoriteView: View {
                                     .foregroundColor(.secondary)
                             }
                             Spacer()
+                            
                         }
                         .padding(.vertical, 4)
                     }
