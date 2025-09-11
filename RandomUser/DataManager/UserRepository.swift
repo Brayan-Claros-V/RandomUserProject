@@ -6,7 +6,7 @@
 //
 
 protocol UserRepositoryProtocol {
-    func saveUser(name: String, email: String, picture: String?)
+    func saveUser(name: String, email: String)
     func showUsers() -> [FUser]
     func deleteUser(_ user: FUser)
 }

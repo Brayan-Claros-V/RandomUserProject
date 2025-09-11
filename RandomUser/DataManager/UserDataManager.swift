@@ -8,14 +8,13 @@
 import CoreData
 
 class UserDataManager: UserRepositoryProtocol {
-    
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
         self.context = context
     }
     
-    func saveUser(name: String, email: String, picture: String?) {
+    func saveUser(name: String, email: String) {
         let user = FUser(context: context)
         user.name = name
         user.email = email

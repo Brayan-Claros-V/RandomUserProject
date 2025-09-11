@@ -12,12 +12,14 @@ import CoreData
 struct ContentView: View {
     let environment: AppEnvironment
     @StateObject private var viewModel: UserListViewModel
-    @State private var isFavorite: Set<String> = []
+    @StateObject private var favoriteVM: FavoriteViewModel
     
     init(environment: AppEnvironment) {
         self.environment = environment
         _viewModel = StateObject(wrappedValue:
         UserListViewModel(service: environment.userService))
+        _favoriteVM = StateObject(wrappedValue:
+        FavoriteViewModel(repository: environment.userRepository))
     }
     
     var body: some View {
@@ -68,21 +70,11 @@ struct ContentView: View {
                                 Spacer()
                                 
                                 Button {
-                                    Task {
-                                        if isFavorite.contains(user.email) {
-                                            isFavorite.remove(user.email)
-                                        } else {
-                                            isFavorite.insert(user.email)
-                                            environment.userRepository.saveUser(
-                                                name: "\(user.name.first) \(user.name.last)",
-                                                email: user.email,
-                                                picture: user.picture.medium
-                                            )
-                                        }
-                                    }
+                                    favoriteVM.toggleFavorite(user: user)
                                 } label: {
-                                    Image(systemName: isFavorite.contains(user.email) ? "star.fill" : "star")
-                                        .foregroundColor(isFavorite.contains(user.email) ? .yellow : .gray)
+                                    let isFav = favoriteVM.isFavorite(email: user.email)
+                                    Image(systemName: isFav ? "star.fill" : "star")
+                                        .foregroundColor(isFav ? .yellow : .gray)
                                 }
                                 .buttonStyle(.plain)
                             }
