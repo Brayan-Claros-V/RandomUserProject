@@ -11,29 +11,33 @@ import CoreData
 @MainActor
 struct ContentView: View {
     let environment: AppEnvironment
-    @StateObject private var viewModel: UserListViewModel
+    @StateObject private var store: UserStore
     @StateObject private var favoriteVM: FavoriteViewModel
-    
+
     init(environment: AppEnvironment) {
         self.environment = environment
-        _viewModel = StateObject(wrappedValue:
-        UserListViewModel(service: environment.userService))
-        _favoriteVM = StateObject(wrappedValue:
-        FavoriteViewModel(repository: environment.userRepository))
+        _store = StateObject(wrappedValue: UserStore(service: environment.userService, reducer: userReducer))
+        _favoriteVM = StateObject(wrappedValue: FavoriteViewModel(repository: environment.userRepository))
     }
-    
+
     var body: some View {
         TabView {
             NavigationView {
                 VStack {
-                    TextField("Search Users...", text: $viewModel.query)
-                        .padding()
-                        .textFieldStyle(.roundedBorder)
-                    if(viewModel.users.isEmpty) {
-                        Text("No users available")
-                    }
+                    TextField("Search Users...", text: Binding(
+                        get: { store.state.query },
+                        set: { store.updateQuery($0) }
+                    ))
+                    .padding()
+                    .textFieldStyle(.roundedBorder)
                     
-                    List(viewModel.users) { user in
+                    if store.state.filteredUsers.isEmpty {
+                        Text("No users available")
+                            .foregroundColor(.gray)
+                            .padding()
+                    }
+
+                    List(store.state.filteredUsers) { user in
                         NavigationLink {
                             UserDetailView(user: user)
                         } label: {
@@ -59,7 +63,7 @@ struct ContentView: View {
                                         .frame(width: 90, height: 90)
                                         .cornerRadius(8)
                                 }
-                                
+
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text("\(user.name.first) \(user.name.last)")
                                         .font(.headline)
@@ -67,8 +71,9 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                 }
+
                                 Spacer()
-                                
+
                                 Button {
                                     favoriteVM.toggleFavorite(user: user)
                                 } label: {
@@ -81,9 +86,9 @@ struct ContentView: View {
                         }
                         .padding(.vertical)
                         .onAppear {
-                            if user.id == viewModel.users.last?.id {
+                            if user.id == store.state.filteredUsers.last?.id {
                                 Task {
-                                    await viewModel.loadUsers()
+                                    store.dispatch(.loadUsers)
                                 }
                             }
                         }
@@ -95,16 +100,18 @@ struct ContentView: View {
             .tabItem {
                 Label("Users", systemImage: "person.3")
             }
+
             FavoriteView(environment: environment)
                 .tabItem {
                     Label("Favorites", systemImage: "star.fill")
                 }
         }
         .task {
-            await viewModel.loadUsers()
+            store.dispatch(.loadUsers)
         }
     }
 }
+
 
 #Preview {
     ContentView(environment: .init())
